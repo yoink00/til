@@ -1,0 +1,63 @@
+= Getting an Individual File from a Stash
+{{ .Author }} <{{ .Email }}>
+{{ .Date }}
+
+== Overview
+
+Today I'd been working on a new feature when I spotted and fixed a bug but this bug really needed to be released before the rest of my work.
+Normally, in this situation I would re-clone the repo and copy the change across but today I thought I'd try something different.
+
+== Background
+
+It turns out that a *stash* in Git is simply:
+
+[quote, 'https://git-scm.com/docs/git-stash#_discussion']
+__
+...a commit whose tree records the state of the working directory, and its first parent is the commit at HEAD when the stash was created."
+__
+
+This means we can treat a *stash* like any other Git reference.
+
+== How-to
+
+To get an individual file from a stash you:
+
+```bash
+$ git checkout 'stash@{0}' -- <filename>
+```
+
+== Other things
+
+Difference between stash and parent:
+
+```bash
+$ git diff 'stash@{0}^1' 'stash@{0}' -- <filename>
+```
+
+[Note]
+__
+`stash@{0}^1` means the first parent of the given stash, which as stated in the explanation above is the commit at which changes were stashed away. We use this form of `git diff` (with two commits) because `stash@{0}` / `refs/stash` is a merge commit, and we have to tell git which parent we want to diff against.
+__
+
+
+Save it under another filename:
+
+```bash
+$ git show 'stash@{0}':<full filename>  >  <newfile>
+```
+
+or
+
+```bash
+$ git show 'stash@{0}':./<relative filename> > <newfile>
+```
+
+[Note]
+__
+Here `<full filename>` is full pathname of a file relative to top directory of a project (think: relative to `stash@{0}`).
+__
+
+== Reference
+
+I found this on https://stackoverflow.com/questions/1105253/how-would-i-extract-a-single-file-or-changes-to-a-file-from-a-git-stash[StackOverflow].
+
